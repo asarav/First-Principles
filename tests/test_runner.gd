@@ -44,6 +44,7 @@ class TestRunner:
 			preload("res://tests/suite_simulation.gd").new(),
 			preload("res://tests/suite_validator.gd").new(),
 			preload("res://tests/suite_serialize.gd").new(),
+			preload("res://tests/suite_session.gd").new(),
 			preload("res://tests/suite_smoke.gd").new(),
 		]
 		var failed := 0

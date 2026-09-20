@@ -3,15 +3,23 @@ extends Control
 signal puzzle_solved(puzzle_id: String, result: Dictionary)
 
 const PAN_STEP := 40.0
+const SIGNAL_ON := Color(0.38, 0.95, 0.78)
+const SIGNAL_OFF := Color(0.28, 0.38, 0.45)
+const SIGNAL_UNSET := Color(0.95, 0.67, 0.28)
+const PANEL_BG := Color(0.06, 0.09, 0.12)
+const PANEL_LINE := Color(0.18, 0.28, 0.34)
 
 var puzzle: PuzzleDefinition
 var graph: GraphEdit
-var inspect_label: Label
 var result_label: Label
 var title_label: Label
 var live_inputs: Dictionary = {}
 var machine: Machine
 var status_label: Label
+var signal_board: VBoxContainer
+var signal_status_label: Label
+var machine_readout: Label
+var signal_rows: Dictionary = {}
 
 
 func _ready() -> void:
@@ -56,8 +64,9 @@ func load_puzzle(puzzle_id: String) -> void:
 	await _rebuild_graph(GameSession.load_construction(puzzle.id))
 	_clear_live_inputs()
 	_rebuild_live_input_controls()
+	_rebuild_signal_board()
 	_sync_machine()
-	_refresh_inspect("Loaded %s." % puzzle.id)
+	_refresh_monitor("Loaded %s." % puzzle.id)
 
 
 func _build_ui() -> void:
@@ -112,28 +121,33 @@ func _build_ui() -> void:
 	root.add_child(right)
 
 	var live_title := Label.new()
-	live_title.text = "Stimulus"
+	live_title.text = "STIMULUS CONTROL"
 	right.add_child(live_title)
 	var live_box := VBoxContainer.new()
 	live_box.name = "LiveInputs"
 	right.add_child(live_box)
+
+	var monitor_title := Label.new()
+	monitor_title.text = "SIGNAL MONITOR"
+	right.add_child(monitor_title)
+	signal_status_label = Label.new()
+	signal_status_label.text = "Waiting for a machine."
+	right.add_child(signal_status_label)
+	signal_board = VBoxContainer.new()
+	signal_board.add_theme_constant_override("separation", 6)
+	right.add_child(signal_board)
 
 	result_label = Label.new()
 	result_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	result_label.text = "Tests have not been run."
 	right.add_child(result_label)
 
-	var inspect_title := Label.new()
-	inspect_title.text = "Inspection"
-	right.add_child(inspect_title)
-
-	var inspect_scroll := ScrollContainer.new()
-	inspect_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	right.add_child(inspect_scroll)
-	inspect_label = Label.new()
-	inspect_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	inspect_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	inspect_scroll.add_child(inspect_label)
+	var readout_title := Label.new()
+	readout_title.text = "MACHINE READOUT"
+	right.add_child(readout_title)
+	machine_readout = Label.new()
+	machine_readout.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	right.add_child(machine_readout)
 
 
 func _build_palette() -> VBoxContainer:
@@ -361,7 +375,7 @@ func _rebuild_live_input_controls() -> void:
 		check.toggled.connect(func(pressed: bool) -> void:
 			live_inputs[io_id] = pressed
 			_apply_live_inputs()
-			_refresh_inspect("Stimulus changed.")
+			_refresh_monitor("Stimulus changed.", true)
 		)
 		box.add_child(check)
 
@@ -378,21 +392,21 @@ func _on_reset() -> void:
 	if machine:
 		machine.reset()
 		_apply_live_inputs()
-	_refresh_inspect("Reset.")
+	_refresh_monitor("Reset.", true)
 
 
 func _on_step() -> void:
 	_sync_machine()
 	if machine:
 		machine.step()
-	_refresh_inspect("Stepped.")
+	_refresh_monitor("Stepped.", true)
 
 
 func _on_settle() -> void:
 	_sync_machine()
 	if machine:
 		machine.settle()
-	_refresh_inspect("Settled.")
+	_refresh_monitor("Settled.", true)
 
 
 func _on_run_tests() -> void:
@@ -403,7 +417,8 @@ func _on_run_tests() -> void:
 	var result := Validator.validate(puzzle, construction)
 	result_label.text = _format_result(result)
 	status_label.text = "PASSED" if result.passed else "FAILED"
-	_refresh_inspect("Tests executed.", result.get("inspect", {}))
+	_refresh_monitor("Tests executed.", true)
+	_animate_signal_change(result.passed)
 	if result.passed:
 		puzzle_solved.emit(puzzle.id, result)
 
@@ -430,7 +445,7 @@ func _on_load_sample() -> void:
 		return
 	await _rebuild_graph(sample)
 	_sync_machine()
-	_refresh_inspect("Loaded sample construction.")
+	_refresh_monitor("Loaded sample construction.", true)
 
 
 func _format_result(result: Dictionary) -> String:
@@ -445,9 +460,105 @@ func _format_result(result: Dictionary) -> String:
 	return "\n".join(lines)
 
 
-func _refresh_inspect(status: String, inspect_override: Dictionary = {}) -> void:
+func _refresh_monitor(status: String, animate: bool = false) -> void:
 	status_label.text = status
-	var data: Dictionary = inspect_override
-	if data.is_empty() and machine:
-		data = machine.inspect()
-	inspect_label.text = JSON.stringify(data, "  ")
+	if machine == null or puzzle == null:
+		signal_status_label.text = "Waiting for a machine."
+		machine_readout.text = "No signal data yet."
+		return
+	signal_status_label.text = "SETTLED" if machine.last_settled else "PROPAGATING"
+	var rows := PackedStringArray()
+	rows.append("tick %d" % machine.tick)
+	rows.append("iterations %d" % machine.last_settle_iterations)
+	if not machine.errors.is_empty():
+		rows.append("errors %d" % machine.errors.size())
+	machine_readout.text = "  ".join(rows)
+	_refresh_signal_rows()
+	if animate:
+		_animate_signal_change(false)
+
+
+func _refresh_signal_rows() -> void:
+	for io_id in puzzle.input_ids():
+		_update_signal_row("in:%s" % io_id, machine.get_output(puzzle.io_component_id("in", io_id)))
+	for io_id in puzzle.output_ids():
+		_update_signal_row("out:%s" % io_id, machine.get_output(puzzle.io_component_id("out", io_id)))
+
+
+func _update_signal_row(row_id: String, value: SignalValue) -> void:
+	if not signal_rows.has(row_id):
+		return
+	var row: Dictionary = signal_rows[row_id]
+	var indicator: ColorRect = row.get("indicator")
+	var value_label: Label = row.get("value_label")
+	var is_set := value != null and value.is_set()
+	var is_on := is_set and value.bool_value
+	indicator.color = SIGNAL_ON if is_on else SIGNAL_OFF if is_set else SIGNAL_UNSET
+	value_label.text = "HIGH" if is_on else "LOW" if is_set else "UNSET"
+
+
+func _animate_signal_change(success: bool) -> void:
+	for row in signal_rows.values():
+		var card: PanelContainer = row.get("card")
+		var indicator: ColorRect = row.get("indicator")
+		if card == null or indicator == null:
+			continue
+		card.modulate = Color.WHITE
+		indicator.modulate = Color.WHITE
+		var tween := create_tween()
+		tween.set_parallel(true)
+		tween.tween_property(card, "modulate", Color(1.35, 1.35, 1.35), 0.10)
+		tween.tween_property(indicator, "scale", Vector2(1.35, 1.35), 0.10)
+		tween.chain().set_parallel(true)
+		tween.tween_property(card, "modulate", Color.WHITE, 0.32)
+		tween.tween_property(indicator, "scale", Vector2.ONE, 0.32)
+	if success:
+		var success_tween := create_tween()
+		success_tween.tween_property(signal_status_label, "modulate", SIGNAL_ON, 0.12)
+		success_tween.tween_property(signal_status_label, "modulate", Color.WHITE, 0.55)
+
+
+func _rebuild_signal_board() -> void:
+	if signal_board == null:
+		return
+	for child in signal_board.get_children():
+		child.queue_free()
+	signal_rows.clear()
+	if puzzle == null:
+		return
+	for item in puzzle.inputs:
+		_add_signal_row("in:%s" % str(item.get("id", "")), "IN", str(item.get("label", item.get("id", ""))))
+	for item in puzzle.outputs:
+		_add_signal_row("out:%s" % str(item.get("id", "")), "OUT", str(item.get("label", item.get("id", ""))))
+
+
+func _add_signal_row(row_id: String, direction: String, label_text: String) -> void:
+	var card := PanelContainer.new()
+	card.custom_minimum_size = Vector2(0, 34)
+	var style := StyleBoxFlat.new()
+	style.bg_color = PANEL_BG
+	style.border_color = PANEL_LINE
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(5)
+	card.add_theme_stylebox_override("panel", style)
+	var line := HBoxContainer.new()
+	line.add_theme_constant_override("separation", 8)
+	card.add_child(line)
+	var indicator := ColorRect.new()
+	indicator.custom_minimum_size = Vector2(8, 8)
+	indicator.color = SIGNAL_UNSET
+	line.add_child(indicator)
+	var direction_label := Label.new()
+	direction_label.text = direction
+	direction_label.custom_minimum_size = Vector2(34, 0)
+	line.add_child(direction_label)
+	var name_label := Label.new()
+	name_label.text = label_text
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	line.add_child(name_label)
+	var value_label := Label.new()
+	value_label.text = "UNSET"
+	value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	line.add_child(value_label)
+	signal_board.add_child(card)
+	signal_rows[row_id] = {"card": card, "indicator": indicator, "value_label": value_label}

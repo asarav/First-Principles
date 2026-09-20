@@ -93,6 +93,15 @@ func current_transmission() -> Dictionary:
 	return {}
 
 
+func available_puzzle_ids() -> PackedStringArray:
+	var ids := PackedStringArray()
+	for event in timeline:
+		var puzzle_id := str(event.get("puzzle_id", ""))
+		if puzzle_id != "" and unlocked_puzzles.has(puzzle_id):
+			ids.append(puzzle_id)
+	return ids
+
+
 func _events_after_puzzle(puzzle_id: String) -> Array:
 	var follow: Array = []
 	var take := false
