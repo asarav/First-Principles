@@ -1,0 +1,41 @@
+{
+	"nv_tx001": {
+		"id": "nv_tx001",
+		"title": "Transmission 0",
+		"lines": [
+			{"speaker": "DEEP SPACE ARRAY", "text": "A narrowband burst arrived at 03:11 UTC. It is not language. It is structured."},
+			{"speaker": "DR. IMANE KESSLER", "text": "No glyphs. No images. The envelope looks like a machine that expects to be exercised."},
+			{"speaker": "DR. IMANE KESSLER", "text": "If we can reconstruct the operation it encodes, we may have a first vocabulary."}
+		]
+	},
+	"nv_disc001": {
+		"id": "nv_disc001",
+		"title": "Working Hypothesis",
+		"lines": [
+			{"speaker": "DR. IMANE KESSLER", "text": "The artifact is stable only when both stimulus lines are asserted. Conjunction. Logical, or something that behaves like it."},
+			{"speaker": "ARCHIVE", "text": "Humanity now has one confirmed primitive. Interpretation remains contested."}
+		]
+	},
+	"nv_sleep001": {
+		"id": "nv_sleep001",
+		"title": "Interval",
+		"lines": [
+			{"speaker": "CRYOSLEEP PROTOCOL", "text": "The next burst is not expected for years. You will sleep. Institutions will not."}
+		]
+	},
+	"nv_tx002": {
+		"id": "nv_tx002",
+		"title": "Transmission 1",
+		"lines": [
+			{"speaker": "DEEP SPACE ARRAY", "text": "A related fragment. Smaller. The return line disagrees with the stimulus."},
+			{"speaker": "DR. IMANE KESSLER", "text": "If the first artifact was conjunction, this may be inversion. Or it may only look that way."}
+		]
+	},
+	"nv_disc002": {
+		"id": "nv_disc002",
+		"title": "Second Primitive",
+		"lines": [
+			{"speaker": "DR. IMANE KESSLER", "text": "Negation. A complete Boolean basis is now in reach. That is a human conclusion. We still do not know if it is theirs."}
+		]
+	}
+}

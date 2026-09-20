@@ -1,0 +1,100 @@
+extends RefCounted
+
+
+func run(t) -> void:
+	t.case("AND truth table")
+	_expect_gate(t, ComponentTypes.AND, {"a": false, "b": false}, false)
+	_expect_gate(t, ComponentTypes.AND, {"a": false, "b": true}, false)
+	_expect_gate(t, ComponentTypes.AND, {"a": true, "b": false}, false)
+	_expect_gate(t, ComponentTypes.AND, {"a": true, "b": true}, true)
+
+	t.case("OR truth table")
+	_expect_gate(t, ComponentTypes.OR, {"a": false, "b": false}, false)
+	_expect_gate(t, ComponentTypes.OR, {"a": true, "b": false}, true)
+
+	t.case("NOT truth table")
+	_expect_unary(t, false, true)
+	_expect_unary(t, true, false)
+
+	t.case("XOR truth table")
+	_expect_gate(t, ComponentTypes.XOR, {"a": true, "b": true}, false)
+	_expect_gate(t, ComponentTypes.XOR, {"a": true, "b": false}, true)
+
+	t.case("constant drives output")
+	var machine := Machine.new()
+	machine.add_component(ComponentTypes.create(ComponentTypes.CONST, "c", {"value": true}))
+	machine.add_component(ComponentTypes.create(ComponentTypes.OUTPUT, "out_y"))
+	machine.add_connection(SimConnection.new("c", "out", "out_y", "in"))
+	machine.settle()
+	t.is_true(machine.get_output("out_y").equals(SignalValue.from_bool(true)))
+
+	t.case("reset clears outputs then restore")
+	machine.reset()
+	t.eq(machine.tick, 0)
+	machine.settle()
+	t.is_true(machine.get_output("out_y").equals(SignalValue.from_bool(true)))
+
+	t.case("step increments tick")
+	var stepped := Machine.new()
+	stepped.add_component(ComponentTypes.create(ComponentTypes.INPUT, "in_a"))
+	stepped.add_component(ComponentTypes.create(ComponentTypes.OUTPUT, "out_y"))
+	stepped.add_connection(SimConnection.new("in_a", "out", "out_y", "in"))
+	stepped.set_input("in_a", SignalValue.from_bool(true))
+	stepped.step()
+	t.eq(stepped.tick, 1)
+	t.is_true(stepped.get_output("out_y").equals(SignalValue.from_bool(true)))
+
+	t.case("duplicate input driver is invalid")
+	var bad := Machine.new()
+	bad.add_component(ComponentTypes.create(ComponentTypes.INPUT, "in_a"))
+	bad.add_component(ComponentTypes.create(ComponentTypes.INPUT, "in_b"))
+	bad.add_component(ComponentTypes.create(ComponentTypes.OUTPUT, "out_y"))
+	t.is_true(bad.add_connection(SimConnection.new("in_a", "out", "out_y", "in")))
+	t.is_false(bad.add_connection(SimConnection.new("in_b", "out", "out_y", "in")))
+	t.is_true(bad.errors.size() > 0)
+
+	t.case("unknown port is invalid")
+	var ports := Machine.new()
+	ports.add_component(ComponentTypes.create(ComponentTypes.AND, "and_1"))
+	ports.add_component(ComponentTypes.create(ComponentTypes.OUTPUT, "out_y"))
+	t.is_false(ports.add_connection(SimConnection.new("and_1", "missing", "out_y", "in")))
+
+	t.case("deterministic settle")
+	var puzzle := PuzzleDefinition.load_path("res://data/puzzles/tx001_conjunction.json")
+	var construction := Construction.load_path("res://data/constructions/tx001_conjunction_sample.json")
+	var a := MachineBuilder.build(puzzle, construction)
+	var b := MachineBuilder.build(puzzle, construction)
+	a.set_input("in_a", SignalValue.from_bool(true))
+	a.set_input("in_b", SignalValue.from_bool(true))
+	b.set_input("in_a", SignalValue.from_bool(true))
+	b.set_input("in_b", SignalValue.from_bool(true))
+	a.settle()
+	b.settle()
+	t.eq(JSON.stringify(a.inspect()), JSON.stringify(b.inspect()))
+
+
+func _expect_gate(t, type_id: String, inputs: Dictionary, expected: bool) -> void:
+	var machine := Machine.new()
+	machine.add_component(ComponentTypes.create(ComponentTypes.INPUT, "in_a"))
+	machine.add_component(ComponentTypes.create(ComponentTypes.INPUT, "in_b"))
+	machine.add_component(ComponentTypes.create(type_id, "g"))
+	machine.add_component(ComponentTypes.create(ComponentTypes.OUTPUT, "out_y"))
+	machine.add_connection(SimConnection.new("in_a", "out", "g", "a"))
+	machine.add_connection(SimConnection.new("in_b", "out", "g", "b"))
+	machine.add_connection(SimConnection.new("g", "out", "out_y", "in"))
+	machine.set_input("in_a", SignalValue.from_bool(inputs.a))
+	machine.set_input("in_b", SignalValue.from_bool(inputs.b))
+	machine.settle()
+	t.is_true(machine.get_output("out_y").equals(SignalValue.from_bool(expected)), "%s %s" % [type_id, str(inputs)])
+
+
+func _expect_unary(t, input_value: bool, expected: bool) -> void:
+	var machine := Machine.new()
+	machine.add_component(ComponentTypes.create(ComponentTypes.INPUT, "in_a"))
+	machine.add_component(ComponentTypes.create(ComponentTypes.NOT, "g"))
+	machine.add_component(ComponentTypes.create(ComponentTypes.OUTPUT, "out_y"))
+	machine.add_connection(SimConnection.new("in_a", "out", "g", "in"))
+	machine.add_connection(SimConnection.new("g", "out", "out_y", "in"))
+	machine.set_input("in_a", SignalValue.from_bool(input_value))
+	machine.settle()
+	t.is_true(machine.get_output("out_y").equals(SignalValue.from_bool(expected)))

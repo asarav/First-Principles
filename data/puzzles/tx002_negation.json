@@ -1,0 +1,30 @@
+{
+	"id": "tx002_negation",
+	"title": "Inverted Return",
+	"description": "A later fragment of the same family of artifacts answers with the opposite of a single stimulus. Reconstruct the operation.",
+	"available_components": ["AND", "OR", "NOT", "XOR", "CONST"],
+	"inputs": [
+		{"id": "a", "label": "Line A", "type": "bool"}
+	],
+	"outputs": [
+		{"id": "y", "label": "Response", "type": "bool"}
+	],
+	"constraints": {
+		"max_components": 8,
+		"banned": []
+	},
+	"scoring": {
+		"mode": "pass_fail"
+	},
+	"narrative": {
+		"transmission_scene": "nv_tx002",
+		"discovery_scene": "nv_disc002"
+	},
+	"unlock": {
+		"requires_puzzle": "tx001_conjunction"
+	},
+	"test_cases": [
+		{"id": "false", "inputs": {"a": false}, "expected": {"y": true}},
+		{"id": "true", "inputs": {"a": true}, "expected": {"y": false}}
+	]
+}

@@ -1,0 +1,16 @@
+{
+	"puzzle_id": "tx001_conjunction",
+	"components": [
+		{
+			"id": "and_1",
+			"type": "AND",
+			"config": {},
+			"position": {"x": 360, "y": 160}
+		}
+	],
+	"connections": [
+		{"from": "in_a", "from_port": "out", "to": "and_1", "to_port": "a"},
+		{"from": "in_b", "from_port": "out", "to": "and_1", "to_port": "b"},
+		{"from": "and_1", "from_port": "out", "to": "out_y", "to_port": "in"}
+	]
+}

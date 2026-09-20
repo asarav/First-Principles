@@ -1,0 +1,41 @@
+{
+	"events": [
+		{
+			"id": "tx001",
+			"year": 2034,
+			"type": "transmission",
+			"puzzle_id": "tx001_conjunction",
+			"narrative_id": "nv_tx001"
+		},
+		{
+			"id": "disc001",
+			"year": 2034,
+			"type": "discovery",
+			"requires_puzzle": "tx001_conjunction",
+			"narrative_id": "nv_disc001"
+		},
+		{
+			"id": "sleep001",
+			"year": 2034,
+			"type": "cryosleep",
+			"years": 10,
+			"requires_puzzle": "tx001_conjunction",
+			"narrative_id": "nv_sleep001"
+		},
+		{
+			"id": "tx002",
+			"year": 2044,
+			"type": "transmission",
+			"puzzle_id": "tx002_negation",
+			"unlock_after": "tx001_conjunction",
+			"narrative_id": "nv_tx002"
+		},
+		{
+			"id": "disc002",
+			"year": 2044,
+			"type": "discovery",
+			"requires_puzzle": "tx002_negation",
+			"narrative_id": "nv_disc002"
+		}
+	]
+}

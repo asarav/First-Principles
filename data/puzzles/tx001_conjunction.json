@@ -1,0 +1,31 @@
+{
+	"id": "tx001_conjunction",
+	"title": "First Structure",
+	"description": "The artifact only yields a stable result when two independent stimulus lines are asserted together. Reconstruct the operation.",
+	"available_components": ["AND", "OR", "NOT", "XOR", "CONST"],
+	"inputs": [
+		{"id": "a", "label": "Line A", "type": "bool"},
+		{"id": "b", "label": "Line B", "type": "bool"}
+	],
+	"outputs": [
+		{"id": "y", "label": "Response", "type": "bool"}
+	],
+	"constraints": {
+		"max_components": 8,
+		"banned": []
+	},
+	"scoring": {
+		"mode": "pass_fail"
+	},
+	"narrative": {
+		"transmission_scene": "nv_tx001",
+		"discovery_scene": "nv_disc001"
+	},
+	"unlock": {},
+	"test_cases": [
+		{"id": "ff", "inputs": {"a": false, "b": false}, "expected": {"y": false}},
+		{"id": "ft", "inputs": {"a": false, "b": true}, "expected": {"y": false}},
+		{"id": "tf", "inputs": {"a": true, "b": false}, "expected": {"y": false}},
+		{"id": "tt", "inputs": {"a": true, "b": true}, "expected": {"y": true}}
+	]
+}
