@@ -1,0 +1,18 @@
+{
+	"id": "tx005_exclusive_return",
+	"title": "Exclusive Return",
+	"description": "The artifact responds when exactly one line is active. When both arrive together, the response disappears.",
+	"available_components": ["XOR"],
+	"inputs": [{"id": "a", "label": "Line A", "type": "bool"}, {"id": "b", "label": "Line B", "type": "bool"}],
+	"outputs": [{"id": "y", "label": "Response", "type": "bool"}],
+	"constraints": {"max_components": 8, "banned": []},
+	"scoring": {"mode": "pass_fail"},
+	"narrative": {"transmission_scene": "nv_tx005", "discovery_scene": "nv_disc005"},
+	"unlock": {"requires_puzzle": "tx004_convergence"},
+	"test_cases": [
+		{"id": "ff", "inputs": {"a": false, "b": false}, "expected": {"y": false}},
+		{"id": "ft", "inputs": {"a": false, "b": true}, "expected": {"y": true}},
+		{"id": "tf", "inputs": {"a": true, "b": false}, "expected": {"y": true}},
+		{"id": "tt", "inputs": {"a": true, "b": true}, "expected": {"y": false}}
+	]
+}

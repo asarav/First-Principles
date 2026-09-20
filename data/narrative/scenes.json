@@ -1,67 +1,56 @@
 {
-	"nv_tx001": {
-		"id": "nv_tx001",
-		"title": "First Contact: The Machine",
-		"lines": [
-			{"speaker": "ARCHIVE // YEAR 2034", "text": "You are Dr. Imane Kessler, systems analyst for the Deep Space Array. Three weeks ago, the Array detected a signal no natural process could have produced."},
-			{"speaker": "DEEP SPACE ARRAY", "text": "A narrowband burst arrived at 03:11 UTC. It is not language. It is structured."},
-			{"speaker": "DR. IMANE KESSLER", "text": "No glyphs. No images. The envelope looks like a machine that expects to be exercised. The sender has given us an experiment, not an explanation."},
-			{"speaker": "DR. IMANE KESSLER", "text": "Your assignment is to reconstruct the operation it encodes. We will change the inputs, observe the response, and keep only what survives every test."},
-			{"speaker": "ARCHIVE", "text": "If the artifact can be understood, humanity will have learned its first word in an unknown language."}
-		]
-	},
-	"nv_disc001": {
-		"id": "nv_disc001",
-		"title": "Working Hypothesis",
-		"lines": [
-			{"speaker": "DR. IMANE KESSLER", "text": "The artifact is stable only when both stimulus lines are asserted. Conjunction. Logical, or something that behaves like it."},
-			{"speaker": "ARCHIVE", "text": "Humanity now has one confirmed primitive. Interpretation remains contested."}
-		]
-	},
-	"nv_sleep001": {
-		"id": "nv_sleep001",
-		"title": "Interval",
-		"lines": [
-			{"speaker": "CRYOSLEEP PROTOCOL", "text": "The next burst is not expected for years. You will sleep. Institutions will not."}
-		]
-	},
-	"nv_tx002": {
-		"id": "nv_tx002",
-		"title": "Transmission 1",
-		"lines": [
-			{"speaker": "DEEP SPACE ARRAY", "text": "A related fragment. Smaller. The return line disagrees with the stimulus."},
-			{"speaker": "DR. IMANE KESSLER", "text": "If the first artifact was conjunction, this may be inversion. Or it may only look that way."}
-		]
-	},
-	"nv_disc002": {
-		"id": "nv_disc002",
-		"title": "Second Primitive",
-		"lines": [
-			{"speaker": "DR. IMANE KESSLER", "text": "Negation. A complete Boolean basis is now in reach. That is a human conclusion. We still do not know if it is theirs."}
-		]
-	},
-	"nv_sleep002": {
-		"id": "nv_sleep002",
-		"title": "Long Interval",
-		"lines": [
-			{"speaker": "CRYOSLEEP PROTOCOL", "text": "The Array has learned enough to predict the next interval. You will sleep for twenty years while the signal crosses the dark."},
-			{"speaker": "ARCHIVE", "text": "The work survives its first investigators. Knowledge is beginning to outlive the people who found it."}
-		]
-	},
-	"nv_tx003": {
-		"id": "nv_tx003",
-		"title": "Transmission 2: Composition",
-		"lines": [
-			{"speaker": "DEEP SPACE ARRAY", "text": "The new fragment contains two recognizable behaviors. It is not repeating itself. It is composing."},
-			{"speaker": "DR. IMANE KESSLER", "text": "The response is active when Line A is present and Line B is absent. The sender expects us to combine what we have learned."}
-		]
-	},
-	"nv_disc003": {
-		"id": "nv_disc003",
-		"title": "Composition",
-		"lines": [
-			{"speaker": "DR. IMANE KESSLER", "text": "The primitives are not isolated facts. They can be assembled into new behavior. We are no longer only recognizing the message. We are learning its grammar."},
-			{"speaker": "ARCHIVE", "text": "Three confirmed operations. The space between understanding and invention has become difficult to measure."}
-		]
-	}
+  "nv_tx001":{"id":"nv_tx001","title":"First Contact: The Machine","lines":[
+    {"speaker":"ARCHIVE // YEAR 2034","text":"You are Dr. Imane Kessler, systems analyst for the Deep Space Array. Three weeks ago, the Array detected a signal no natural process could have produced."},
+    {"speaker":"DEEP SPACE ARRAY","text":"A narrowband burst arrived at 03:11 UTC. It is not language. It is structured."},
+    {"speaker":"DR. IMANE KESSLER","text":"No glyphs. No images. The envelope looks like a machine that expects to be exercised. The sender has given us an experiment, not an explanation."},
+    {"speaker":"DR. IMANE KESSLER","text":"Change one condition at a time. Record the response. Keep only what survives every test."},
+    {"speaker":"ARCHIVE","text":"If the artifact can be understood, humanity will have learned its first word in an unknown language."}]},
+  "nv_disc001":{"id":"nv_disc001","title":"Working Hypothesis","lines":[
+    {"speaker":"DR. IMANE KESSLER","text":"Both lines must be present. We can call the relation conjunction, but that name is ours. The artifact has not agreed to our vocabulary."},
+    {"speaker":"ARCHIVE","text":"The Array has one reliable relationship and no explanation for why it was sent."}]},
+  "nv_sleep001":{"id":"nv_sleep001","title":"Interval","lines":[{"speaker":"CRYOSLEEP PROTOCOL","text":"The next burst is not expected for ten years. You will sleep. The Array will continue without you."}]},
+  "nv_tx002":{"id":"nv_tx002","title":"Transmission 1: Disagreement","lines":[
+    {"speaker":"DEEP SPACE ARRAY","text":"The second burst is smaller. Its response disagrees with a single stimulus every time."},
+    {"speaker":"DR. IMANE KESSLER","text":"We have a dangerous habit already: naming a pattern before we know what it is. Test the disagreement. Do not trust the label."}]},
+  "nv_disc002":{"id":"nv_disc002","title":"Second Primitive","lines":[
+    {"speaker":"DR. IMANE KESSLER","text":"The response reverses the stimulus. Negation is a useful description, not necessarily the thing itself. We have learned an operation and exposed our first translation problem."},
+    {"speaker":"ARCHIVE","text":"Two artifacts. Two human names. No evidence that the sender thinks in either category."}]},
+  "nv_sleep002":{"id":"nv_sleep002","title":"Long Interval","lines":[
+    {"speaker":"CRYOSLEEP PROTOCOL","text":"The next burst will take twenty years to arrive. You will sleep while the signal crosses the dark."},
+    {"speaker":"ARCHIVE","text":"The work survives its first investigators. Knowledge is beginning to outlive the people who found it."}]},
+  "nv_tx003":{"id":"nv_tx003","title":"Transmission 2: Composition","lines":[
+    {"speaker":"DEEP SPACE ARRAY","text":"The new fragment contains two recognizable behaviors. It is not repeating itself. It is composing."},
+    {"speaker":"DR. IMANE KESSLER","text":"Line A must be present while Line B is absent. The sender expects us to combine what we have learned, then judge the result without assuming the pieces are the message."}]},
+  "nv_disc003":{"id":"nv_disc003","title":"Composition","lines":[
+    {"speaker":"DR. IMANE KESSLER","text":"The primitives are not isolated facts. They can be assembled into new behavior. We are no longer only recognizing the message. We are learning its grammar."},
+    {"speaker":"ARCHIVE","text":"Three confirmed artifacts. The space between understanding and invention has become difficult to measure."}]},
+  "nv_sleep003":{"id":"nv_sleep003","title":"A Longer Silence","lines":[{"speaker":"ARCHIVE","text":"Ten years pass. The Array becomes a network of institutions, and the original transmission becomes a disputed historical object."}]},
+  "nv_tx004":{"id":"nv_tx004","title":"Convergence","lines":[
+    {"speaker":"DEEP SPACE ARRAY","text":"Two lines can now produce the same response independently. The artifact does not identify a preferred cause."},
+    {"speaker":"DR. IMANE KESSLER","text":"We assumed a response had one reason. This machine may be describing alternatives that are equivalent only at the output."}]},
+  "nv_disc004":{"id":"nv_disc004","title":"No Single Cause","lines":[
+    {"speaker":"DR. IMANE KESSLER","text":"Either line is sufficient. We kept looking for which signal was responsible when the artifact only cared whether a path existed."},
+    {"speaker":"ARCHIVE","text":"Behavior may matter more than the parts that produce it."}]},
+  "nv_sleep004":{"id":"nv_sleep004","title":"The Witnesses","lines":[{"speaker":"ARCHIVE","text":"Fifteen years pass. Three institutions maintain competing records of the same discoveries. Their diagrams disagree. Their test results do not."}]},
+  "nv_tx005":{"id":"nv_tx005","title":"Exclusive Return","lines":[
+    {"speaker":"DEEP SPACE ARRAY","text":"The response appears when exactly one line is active. When both arrive together, the artifact goes quiet."},
+    {"speaker":"DR. IMANE KESSLER","text":"This is not simply another condition. Agreement suppresses the response. The machine distinguishes difference from magnitude."}]},
+  "nv_disc005":{"id":"nv_disc005","title":"Difference","lines":[{"speaker":"DR. IMANE KESSLER","text":"The artifact responds to disagreement. We kept looking for a stronger signal. It was measuring a relationship between signals instead."}]},
+  "nv_sleep005":{"id":"nv_sleep005","title":"Inherited Questions","lines":[{"speaker":"CRYOSLEEP PROTOCOL","text":"Twenty years pass. Dr. Kessler wakes to a team that knows her conclusions but not the experiments that produced them."}]},
+  "nv_tx006":{"id":"nv_tx006","title":"Hidden Agreement","lines":[
+    {"speaker":"DEEP SPACE ARRAY","text":"The next artifact is active when both lines agree, whether they are both present or both absent."},
+    {"speaker":"DR. IMANE KESSLER","text":"We can build it from what we know. The question is why the sender made agreement visible only after teaching us disagreement."}]},
+  "nv_disc006":{"id":"nv_disc006","title":"The Relation Is Primary","lines":[{"speaker":"DR. IMANE KESSLER","text":"The machine does not care about either line by itself. It cares about their relation. We are beginning to mistake the diagram for the phenomenon."}]},
+  "nv_sleep006":{"id":"nv_sleep006","title":"The Archive Moves","lines":[{"speaker":"ARCHIVE","text":"Thirty years pass. The Array moves its main archive underground after a failed attempt to reproduce an artifact outside controlled conditions."}]},
+  "nv_tx007":{"id":"nv_tx007","title":"The First Distance","lines":[
+    {"speaker":"DEEP SPACE ARRAY","text":"The final early fragment uses the same signals but arrives with two possible path arrangements."},
+    {"speaker":"DR. IMANE KESSLER","text":"The truth table is unchanged. The geometry is not. If both constructions behave identically, why did the sender preserve the distance between them?"}]},
+  "nv_disc007":{"id":"nv_disc007","title":"The Diagram Was Not Neutral","lines":[{"speaker":"DR. IMANE KESSLER","text":"We treated position as presentation. The artifact may have treated it as data. Our first vocabulary was never as abstract as we believed."}]},
+  "nv_sleep007":{"id":"nv_sleep007","title":"The First Long Interval","lines":[{"speaker":"CRYOSLEEP PROTOCOL","text":"Fifty years pass. The next transmission arrives after the original Array has become a historical site and a pilgrimage destination."}]},
+  "nv_tx008":{"id":"nv_tx008","title":"The Unsettled Signal","lines":[
+    {"speaker":"DEEP SPACE ARRAY","text":"The response never becomes quiet. Every attempt to stabilize it changes what it is measuring."},
+    {"speaker":"DR. IMANE KESSLER","text":"We have treated failure to settle as a defect. What if the changing signal is the artifact's answer?"}]},
+  "nv_disc008":{"id":"nv_disc008","title":"A Question That Moves","lines":[
+    {"speaker":"DR. IMANE KESSLER","text":"The machine is not only producing a result. It is producing a history. We need a vocabulary for systems whose meaning depends on what happened before."},
+    {"speaker":"ARCHIVE","text":"The next era will not ask only what the machine computes. It will ask when computation exists."}]}
 }

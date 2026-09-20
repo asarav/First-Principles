@@ -1,57 +1,27 @@
 {
-	"events": [
-		{
-			"id": "tx001",
-			"year": 2034,
-			"type": "transmission",
-			"puzzle_id": "tx001_conjunction",
-			"narrative_id": "nv_tx001"
-		},
-		{
-			"id": "disc001",
-			"year": 2034,
-			"type": "discovery",
-			"requires_puzzle": "tx001_conjunction",
-			"narrative_id": "nv_disc001"
-		},
-		{
-			"id": "sleep001",
-			"year": 2034,
-			"type": "cryosleep",
-			"years": 10,
-			"requires_puzzle": "tx001_conjunction",
-			"narrative_id": "nv_sleep001"
-		},
-		{
-			"id": "tx002",
-			"year": 2044,
-			"type": "transmission",
-			"puzzle_id": "tx002_negation",
-			"unlock_after": "tx001_conjunction",
-			"narrative_id": "nv_tx002"
-		},
-		{
-			"id": "disc002",
-			"year": 2044,
-			"type": "discovery",
-			"requires_puzzle": "tx002_negation",
-			"narrative_id": "nv_disc002"
-		},
-		{
-			"id": "sleep002",
-			"year": 2044,
-			"type": "cryosleep",
-			"years": 20,
-			"requires_puzzle": "tx002_negation",
-			"narrative_id": "nv_sleep002"
-		},
-		{
-			"id": "tx003",
-			"year": 2064,
-			"type": "transmission",
-			"puzzle_id": "tx003_selective_inversion",
-			"unlock_after": "tx002_negation",
-			"narrative_id": "nv_tx003"
-		}
-	]
+  "events": [
+    {"id":"tx001","year":2034,"type":"transmission","puzzle_id":"tx001_conjunction","narrative_id":"nv_tx001"},
+    {"id":"disc001","year":2034,"type":"discovery","requires_puzzle":"tx001_conjunction","narrative_id":"nv_disc001"},
+    {"id":"sleep001","year":2034,"type":"cryosleep","years":10,"requires_puzzle":"tx001_conjunction","narrative_id":"nv_sleep001"},
+    {"id":"tx002","year":2044,"type":"transmission","puzzle_id":"tx002_negation","unlock_after":"tx001_conjunction","narrative_id":"nv_tx002"},
+    {"id":"disc002","year":2044,"type":"discovery","requires_puzzle":"tx002_negation","narrative_id":"nv_disc002"},
+    {"id":"sleep002","year":2044,"type":"cryosleep","years":20,"requires_puzzle":"tx002_negation","narrative_id":"nv_sleep002"},
+    {"id":"tx003","year":2064,"type":"transmission","puzzle_id":"tx003_selective_inversion","unlock_after":"tx002_negation","narrative_id":"nv_tx003"},
+    {"id":"disc003","year":2064,"type":"discovery","requires_puzzle":"tx003_selective_inversion","narrative_id":"nv_disc003"},
+    {"id":"sleep003","year":2064,"type":"cryosleep","years":10,"requires_puzzle":"tx003_selective_inversion","narrative_id":"nv_sleep003"},
+    {"id":"tx004","year":2074,"type":"transmission","puzzle_id":"tx004_convergence","unlock_after":"tx003_selective_inversion","narrative_id":"nv_tx004"},
+    {"id":"disc004","year":2074,"type":"discovery","requires_puzzle":"tx004_convergence","narrative_id":"nv_disc004"},
+    {"id":"sleep004","year":2074,"type":"cryosleep","years":15,"requires_puzzle":"tx004_convergence","narrative_id":"nv_sleep004"},
+    {"id":"tx005","year":2089,"type":"transmission","puzzle_id":"tx005_exclusive_return","unlock_after":"tx004_convergence","narrative_id":"nv_tx005"},
+    {"id":"disc005","year":2089,"type":"discovery","requires_puzzle":"tx005_exclusive_return","narrative_id":"nv_disc005"},
+    {"id":"sleep005","year":2089,"type":"cryosleep","years":20,"requires_puzzle":"tx005_exclusive_return","narrative_id":"nv_sleep005"},
+    {"id":"tx006","year":2109,"type":"transmission","puzzle_id":"tx006_hidden_agreement","unlock_after":"tx005_exclusive_return","narrative_id":"nv_tx006"},
+    {"id":"disc006","year":2109,"type":"discovery","requires_puzzle":"tx006_hidden_agreement","narrative_id":"nv_disc006"},
+    {"id":"sleep006","year":2109,"type":"cryosleep","years":30,"requires_puzzle":"tx006_hidden_agreement","narrative_id":"nv_sleep006"},
+    {"id":"tx007","year":2139,"type":"transmission","puzzle_id":"tx007_first_distance","unlock_after":"tx006_hidden_agreement","narrative_id":"nv_tx007"},
+    {"id":"disc007","year":2139,"type":"discovery","requires_puzzle":"tx007_first_distance","narrative_id":"nv_disc007"},
+    {"id":"sleep007","year":2139,"type":"cryosleep","years":50,"requires_puzzle":"tx007_first_distance","narrative_id":"nv_sleep007"},
+    {"id":"tx008","year":2189,"type":"transmission","puzzle_id":"tx008_oscillation","unlock_after":"tx007_first_distance","narrative_id":"nv_tx008"},
+    {"id":"disc008","year":2189,"type":"discovery","requires_puzzle":"tx008_oscillation","narrative_id":"nv_disc008"}
+  ]
 }

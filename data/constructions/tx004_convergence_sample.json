@@ -1,0 +1,9 @@
+{
+	"puzzle_id": "tx004_convergence",
+	"components": [{"id": "or_1", "type": "OR", "config": {}, "position": {"x": 360, "y": 160}}],
+	"connections": [
+		{"from": "in_a", "from_port": "out", "to": "or_1", "to_port": "a"},
+		{"from": "in_b", "from_port": "out", "to": "or_1", "to_port": "b"},
+		{"from": "or_1", "from_port": "out", "to": "out_y", "to_port": "in"}
+	]
+}

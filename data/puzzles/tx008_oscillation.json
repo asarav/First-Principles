@@ -1,0 +1,13 @@
+{
+	"id": "tx008_oscillation",
+	"title": "The Unsettled Signal",
+	"description": "The archive contains a response that never becomes quiet. Reconstruct the simplest explanation for an artifact that changes instead of settling.",
+	"available_components": ["NOT"],
+	"inputs": [{"id": "a", "label": "Line A", "type": "bool"}],
+	"outputs": [{"id": "y", "label": "Response", "type": "bool"}],
+	"constraints": {"max_components": 2, "banned": []},
+	"scoring": {"mode": "pass_fail"},
+	"narrative": {"transmission_scene": "nv_tx008", "discovery_scene": "nv_disc008"},
+	"unlock": {"requires_puzzle": "tx007_first_distance"},
+	"test_cases": [{"id": "quiet", "inputs": {"a": false}, "expected": {"y": true}}]
+}

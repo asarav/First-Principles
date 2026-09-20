@@ -1,0 +1,18 @@
+{
+	"id": "tx007_first_distance",
+	"title": "The First Distance",
+	"description": "A final early artifact uses the same primitive vocabulary, but one response line is active only when the two paths agree. Humanity must decide whether the geometry is part of the message.",
+	"available_components": ["AND", "OR", "NOT", "XOR"],
+	"inputs": [{"id": "a", "label": "Line A", "type": "bool"}, {"id": "b", "label": "Line B", "type": "bool"}],
+	"outputs": [{"id": "y", "label": "Response", "type": "bool"}],
+	"constraints": {"max_components": 8, "banned": []},
+	"scoring": {"mode": "pass_fail"},
+	"narrative": {"transmission_scene": "nv_tx007", "discovery_scene": "nv_disc007"},
+	"unlock": {"requires_puzzle": "tx006_hidden_agreement"},
+	"test_cases": [
+		{"id": "ff", "inputs": {"a": false, "b": false}, "expected": {"y": true}},
+		{"id": "ft", "inputs": {"a": false, "b": true}, "expected": {"y": false}},
+		{"id": "tf", "inputs": {"a": true, "b": false}, "expected": {"y": false}},
+		{"id": "tt", "inputs": {"a": true, "b": true}, "expected": {"y": true}}
+	]
+}

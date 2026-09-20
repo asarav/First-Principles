@@ -1,0 +1,10 @@
+{
+	"puzzle_id": "tx007_first_distance",
+	"components": [{"id": "xor_1", "type": "XOR", "config": {}, "position": {"x": 360, "y": 160}}, {"id": "not_1", "type": "NOT", "config": {}, "position": {"x": 560, "y": 160}}],
+	"connections": [
+		{"from": "in_a", "from_port": "out", "to": "xor_1", "to_port": "a"},
+		{"from": "in_b", "from_port": "out", "to": "xor_1", "to_port": "b"},
+		{"from": "xor_1", "from_port": "out", "to": "not_1", "to_port": "in"},
+		{"from": "not_1", "from_port": "out", "to": "out_y", "to_port": "in"}
+	]
+}

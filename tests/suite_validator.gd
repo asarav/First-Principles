@@ -67,6 +67,20 @@ func run(t) -> void:
 	t.eq(composition.available_components, PackedStringArray(["AND", "NOT"]))
 	t.is_true(Validator.validate(composition, composition_solution).passed)
 
+	t.case("early progression sample constructions pass")
+	var progression_ids := PackedStringArray([
+		"tx004_convergence",
+		"tx005_exclusive_return",
+		"tx006_hidden_agreement",
+		"tx007_first_distance",
+		"tx008_oscillation",
+	])
+	for progression_id in progression_ids:
+		var progression_puzzle := PuzzleDefinition.load_path("res://data/puzzles/%s.json" % progression_id)
+		var progression_sample := Construction.load_path("res://data/constructions/%s_sample.json" % progression_id)
+		t.is_true(progression_puzzle != null)
+		t.is_true(Validator.validate(progression_puzzle, progression_sample).passed, progression_id)
+
 	t.case("multiple test cases reported")
 	t.eq(result.tests.size(), 4)
 	for case_result in result.tests:

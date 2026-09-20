@@ -1,0 +1,21 @@
+{
+	"puzzle_id": "tx006_hidden_agreement",
+	"components": [
+		{"id": "not_1", "type": "NOT", "config": {}, "position": {"x": 260, "y": 280}},
+		{"id": "not_2", "type": "NOT", "config": {}, "position": {"x": 260, "y": 80}},
+		{"id": "and_1", "type": "AND", "config": {}, "position": {"x": 500, "y": 80}},
+		{"id": "and_2", "type": "AND", "config": {}, "position": {"x": 500, "y": 280}},
+		{"id": "or_1", "type": "OR", "config": {}, "position": {"x": 740, "y": 160}}
+	],
+	"connections": [
+		{"from": "in_a", "from_port": "out", "to": "not_1", "to_port": "in"},
+		{"from": "in_b", "from_port": "out", "to": "not_2", "to_port": "in"},
+		{"from": "not_1", "from_port": "out", "to": "and_1", "to_port": "a"},
+		{"from": "not_2", "from_port": "out", "to": "and_1", "to_port": "b"},
+		{"from": "in_a", "from_port": "out", "to": "and_2", "to_port": "a"},
+		{"from": "in_b", "from_port": "out", "to": "and_2", "to_port": "b"},
+		{"from": "and_1", "from_port": "out", "to": "or_1", "to_port": "a"},
+		{"from": "and_2", "from_port": "out", "to": "or_1", "to_port": "b"},
+		{"from": "or_1", "from_port": "out", "to": "out_y", "to_port": "in"}
+	]
+}

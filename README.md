@@ -15,7 +15,7 @@ The project currently includes:
 
 The foundation has been verified with the Godot console runner:
 
-- 73 automated tests passed
+- 84 automated tests passed
 - 0 failed
 
 ## Run the game
