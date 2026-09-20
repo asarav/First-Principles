@@ -27,7 +27,8 @@ func _build() -> void:
 	narrative = _build_narrative()
 	add_child(narrative)
 
-	workbench = preload("res://scenes/workbench.gd").new()
+	var workbench_script = load("res://scenes/workbench.gd")
+	workbench = workbench_script.new()
 	workbench.set_anchors_preset(PRESET_FULL_RECT)
 	workbench.visible = false
 	workbench.puzzle_solved.connect(_on_puzzle_solved)

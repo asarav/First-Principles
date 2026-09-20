@@ -27,7 +27,14 @@ func _smoke_main_scene() -> int:
 		print("FAIL scene smoke :: instance vanished")
 		return 1
 	print("scene smoke: passed")
-	scene.queue_free()
+	if is_instance_valid(scene):
+		for child in root.get_children():
+			if is_instance_valid(child):
+				root.remove_child(child)
+				child.free()
+		scene = null
+		await process_frame
+		await process_frame
 	return 0
 
 

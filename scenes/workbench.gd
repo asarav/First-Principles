@@ -2,6 +2,8 @@ extends Control
 
 signal puzzle_solved(puzzle_id: String, result: Dictionary)
 
+const PAN_STEP := 40.0
+
 var puzzle: PuzzleDefinition
 var graph: GraphEdit
 var inspect_label: Label
@@ -17,12 +19,40 @@ func _ready() -> void:
 	_build_ui()
 
 
+func _input(event: InputEvent) -> void:
+	if event is not InputEventKey:
+		return
+	if not (event as InputEventKey).pressed:
+		return
+	if (event as InputEventKey).echo:
+		return
+	if graph == null or not is_instance_valid(graph):
+		return
+	var keycode := (event as InputEventKey).keycode
+	var delta := Vector2.ZERO
+	match keycode:
+		KEY_W, KEY_UP:
+			delta.y = -PAN_STEP
+		KEY_S, KEY_DOWN:
+			delta.y = PAN_STEP
+		KEY_A, KEY_LEFT:
+			delta.x = -PAN_STEP
+		KEY_D, KEY_RIGHT:
+			delta.x = PAN_STEP
+		_:
+			return
+	graph.scroll_offset += delta
+	accept_event()
+
+
 func load_puzzle(puzzle_id: String) -> void:
 	puzzle = PuzzleLibrary.load_id(puzzle_id)
 	if puzzle == null:
 		result_label.text = "Could not load puzzle %s" % puzzle_id
 		return
 	title_label.text = "%s\n%s" % [puzzle.title, puzzle.description]
+	graph.scroll_offset = Vector2.ZERO
+	graph.zoom = 1.0
 	await _rebuild_graph(GameSession.load_construction(puzzle.id))
 	_clear_live_inputs()
 	_rebuild_live_input_controls()
@@ -52,6 +82,10 @@ func _build_ui() -> void:
 	graph.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	graph.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	graph.right_disconnects = true
+	graph.minimap_enabled = false
+	graph.show_zoom_label = true
+	graph.snapping_distance = 20.0
+	graph.zoom = 1.0
 	graph.connection_request.connect(_on_connection_request)
 	graph.disconnection_request.connect(_on_disconnection_request)
 	graph.delete_nodes_request.connect(_on_delete_nodes_request)
@@ -120,11 +154,16 @@ func _add_button(parent: Node, text: String, callback: Callable) -> void:
 	parent.add_child(button)
 
 
-func _rebuild_graph(construction: Construction) -> void:
+func _free_graph_children() -> void:
 	for child in graph.get_children():
 		if child is GraphElement:
-			child.queue_free()
+			graph.remove_child(child)
+			child.free()
 	graph.clear_connections()
+
+
+func _rebuild_graph(construction: Construction) -> void:
+	_free_graph_children()
 	if puzzle == null:
 		return
 
@@ -159,7 +198,6 @@ func _make_node(id: String, type_id: String, position: Vector2, config: Dictiona
 	node.set_meta("config", config.duplicate(true))
 	if locked:
 		node.selectable = true
-		node.deletable = false
 
 	var inputs := ComponentTypes.input_port_names(type_id)
 	var outputs := ComponentTypes.output_port_names(type_id)
@@ -224,7 +262,7 @@ func _on_delete_nodes_request(nodes: Array) -> void:
 		if bool(node.get_meta("locked", false)):
 			continue
 		graph.remove_child(node)
-		node.queue_free()
+		node.free()
 	_sync_machine()
 
 
