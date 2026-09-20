@@ -41,6 +41,46 @@ static func display_name(type_id: String) -> String:
 	return type_id
 
 
+static func symbol(type_id: String) -> String:
+	match type_id:
+		AND:
+			return "∧"
+		OR:
+			return "∨"
+		NOT:
+			return "¬"
+		XOR:
+			return "⊕"
+		CONST:
+			return "●"
+		INPUT:
+			return "→"
+		OUTPUT:
+			return "←"
+		_:
+			return "?"
+
+
+static func beginner_description(type_id: String) -> String:
+	match type_id:
+		AND:
+			return "AND / ∧: the output is ON only when both inputs are ON."
+		OR:
+			return "OR / ∨: the output is ON when either input is ON."
+		NOT:
+			return "NOT / ¬: reverses the input. ON becomes OFF and OFF becomes ON."
+		XOR:
+			return "XOR / ⊕: the output is ON when exactly one input is ON."
+		CONST:
+			return "CONST / ●: provides a fixed ON or OFF signal."
+		INPUT:
+			return "INPUT / →: a stimulus entering the circuit."
+		OUTPUT:
+			return "OUTPUT / ←: the response produced by the circuit."
+		_:
+			return "Unknown component."
+
+
 static func input_port_names(type_id: String) -> PackedStringArray:
 	var sample := create(type_id, "_probe")
 	if sample == null:

@@ -1,11 +1,13 @@
 {
 	"nv_tx001": {
 		"id": "nv_tx001",
-		"title": "Transmission 0",
+		"title": "First Contact: The Machine",
 		"lines": [
+			{"speaker": "ARCHIVE // YEAR 2034", "text": "You are Dr. Imane Kessler, systems analyst for the Deep Space Array. Three weeks ago, the Array detected a signal no natural process could have produced."},
 			{"speaker": "DEEP SPACE ARRAY", "text": "A narrowband burst arrived at 03:11 UTC. It is not language. It is structured."},
-			{"speaker": "DR. IMANE KESSLER", "text": "No glyphs. No images. The envelope looks like a machine that expects to be exercised."},
-			{"speaker": "DR. IMANE KESSLER", "text": "If we can reconstruct the operation it encodes, we may have a first vocabulary."}
+			{"speaker": "DR. IMANE KESSLER", "text": "No glyphs. No images. The envelope looks like a machine that expects to be exercised. The sender has given us an experiment, not an explanation."},
+			{"speaker": "DR. IMANE KESSLER", "text": "Your assignment is to reconstruct the operation it encodes. We will change the inputs, observe the response, and keep only what survives every test."},
+			{"speaker": "ARCHIVE", "text": "If the artifact can be understood, humanity will have learned its first word in an unknown language."}
 		]
 	},
 	"nv_disc001": {

@@ -71,7 +71,10 @@ func get_output(output_id: String) -> SignalValue:
 
 func step() -> bool:
 	tick += 1
-	return _evaluate_wave()
+	var changed := _evaluate_wave()
+	last_settle_iterations = 0
+	last_settled = not changed
+	return changed
 
 
 func settle(max_iterations: int = 32) -> bool:

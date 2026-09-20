@@ -2,7 +2,7 @@
 	"id": "tx002_negation",
 	"title": "Inverted Return",
 	"description": "A later fragment of the same family of artifacts answers with the opposite of a single stimulus. Reconstruct the operation.",
-	"available_components": ["AND", "OR", "NOT", "XOR", "CONST"],
+	"available_components": ["NOT"],
 	"inputs": [
 		{"id": "a", "label": "Line A", "type": "bool"}
 	],

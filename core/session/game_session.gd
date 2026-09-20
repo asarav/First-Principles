@@ -12,6 +12,7 @@ var current_puzzle_id: String = "tx001_conjunction"
 var timeline: Array = []
 var scenes: Dictionary = {}
 var last_event_id: String = "tx001"
+var intro_seen: bool = false
 
 
 func _ready() -> void:
@@ -30,6 +31,7 @@ func load_session() -> void:
 	unlocked_puzzles = PackedStringArray(data.get("unlocked_puzzles", Array(unlocked_puzzles)))
 	current_puzzle_id = str(data.get("current_puzzle_id", current_puzzle_id))
 	last_event_id = str(data.get("last_event_id", last_event_id))
+	intro_seen = bool(data.get("intro_seen", intro_seen))
 	session_changed.emit()
 
 
@@ -40,7 +42,19 @@ func save_session() -> void:
 		"unlocked_puzzles": Array(unlocked_puzzles),
 		"current_puzzle_id": current_puzzle_id,
 		"last_event_id": last_event_id,
+		"intro_seen": intro_seen,
 	})
+
+
+func reset_session() -> void:
+	year = 2034
+	completed_puzzles = PackedStringArray()
+	unlocked_puzzles = PackedStringArray(["tx001_conjunction"])
+	current_puzzle_id = "tx001_conjunction"
+	last_event_id = "tx001"
+	intro_seen = false
+	save_session()
+	session_changed.emit()
 
 
 func construction_path(puzzle_id: String) -> String:

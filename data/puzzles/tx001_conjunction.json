@@ -2,7 +2,7 @@
 	"id": "tx001_conjunction",
 	"title": "First Structure",
 	"description": "The artifact only yields a stable result when two independent stimulus lines are asserted together. Reconstruct the operation.",
-	"available_components": ["AND", "OR", "NOT", "XOR", "CONST"],
+	"available_components": ["AND"],
 	"inputs": [
 		{"id": "a", "label": "Line A", "type": "bool"},
 		{"id": "b", "label": "Line B", "type": "bool"}

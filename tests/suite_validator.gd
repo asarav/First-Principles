@@ -56,6 +56,7 @@ func run(t) -> void:
 	t.case("correct NOT solution passes second puzzle")
 	var not_puzzle := PuzzleDefinition.load_path("res://data/puzzles/tx002_negation.json")
 	var not_solution := Construction.load_path("res://data/constructions/tx002_negation_sample.json")
+	t.eq(not_puzzle.available_components, PackedStringArray(["NOT"]))
 	var not_result := Validator.validate(not_puzzle, not_solution)
 	t.is_true(not_result.passed, str(not_result.errors))
 	t.eq(not_result.tests.size(), 2)
