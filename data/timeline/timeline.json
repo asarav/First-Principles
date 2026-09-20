@@ -36,6 +36,22 @@
 			"type": "discovery",
 			"requires_puzzle": "tx002_negation",
 			"narrative_id": "nv_disc002"
+		},
+		{
+			"id": "sleep002",
+			"year": 2044,
+			"type": "cryosleep",
+			"years": 20,
+			"requires_puzzle": "tx002_negation",
+			"narrative_id": "nv_sleep002"
+		},
+		{
+			"id": "tx003",
+			"year": 2064,
+			"type": "transmission",
+			"puzzle_id": "tx003_selective_inversion",
+			"unlock_after": "tx002_negation",
+			"narrative_id": "nv_tx003"
 		}
 	]
 }

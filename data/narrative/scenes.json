@@ -39,5 +39,29 @@
 		"lines": [
 			{"speaker": "DR. IMANE KESSLER", "text": "Negation. A complete Boolean basis is now in reach. That is a human conclusion. We still do not know if it is theirs."}
 		]
+	},
+	"nv_sleep002": {
+		"id": "nv_sleep002",
+		"title": "Long Interval",
+		"lines": [
+			{"speaker": "CRYOSLEEP PROTOCOL", "text": "The Array has learned enough to predict the next interval. You will sleep for twenty years while the signal crosses the dark."},
+			{"speaker": "ARCHIVE", "text": "The work survives its first investigators. Knowledge is beginning to outlive the people who found it."}
+		]
+	},
+	"nv_tx003": {
+		"id": "nv_tx003",
+		"title": "Transmission 2: Composition",
+		"lines": [
+			{"speaker": "DEEP SPACE ARRAY", "text": "The new fragment contains two recognizable behaviors. It is not repeating itself. It is composing."},
+			{"speaker": "DR. IMANE KESSLER", "text": "The response is active when Line A is present and Line B is absent. The sender expects us to combine what we have learned."}
+		]
+	},
+	"nv_disc003": {
+		"id": "nv_disc003",
+		"title": "Composition",
+		"lines": [
+			{"speaker": "DR. IMANE KESSLER", "text": "The primitives are not isolated facts. They can be assembled into new behavior. We are no longer only recognizing the message. We are learning its grammar."},
+			{"speaker": "ARCHIVE", "text": "Three confirmed operations. The space between understanding and invention has become difficult to measure."}
+		]
 	}
 }

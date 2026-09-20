@@ -19,6 +19,7 @@ func _ready() -> void:
 	timeline = _load_json_array("res://data/timeline/timeline.json")
 	scenes = _load_json_dict("res://data/narrative/scenes.json")
 	load_session()
+	_repair_progression()
 
 
 func load_session() -> void:
@@ -76,6 +77,8 @@ func load_construction(puzzle_id: String) -> Construction:
 
 func complete_puzzle(puzzle_id: String) -> Dictionary:
 	if completed_puzzles.has(puzzle_id):
+		_repair_progression()
+		save_session()
 		return {"year": year, "events": []}
 	completed_puzzles.append(puzzle_id)
 	var follow := _events_after_puzzle(puzzle_id)
@@ -94,6 +97,22 @@ func complete_puzzle(puzzle_id: String) -> Dictionary:
 	save_session()
 	session_changed.emit()
 	return {"year": year, "events": follow}
+
+
+func _repair_progression() -> void:
+	for event in timeline:
+		if event.get("type", "") != "transmission":
+			continue
+		var required := str(event.get("unlock_after", ""))
+		var next_puzzle := str(event.get("puzzle_id", ""))
+		if required != "" and completed_puzzles.has(required) and next_puzzle != "" and not unlocked_puzzles.has(next_puzzle):
+			unlocked_puzzles.append(next_puzzle)
+	if current_puzzle_id == "" or completed_puzzles.has(current_puzzle_id):
+		for event in timeline:
+			var candidate := str(event.get("puzzle_id", ""))
+			if candidate != "" and unlocked_puzzles.has(candidate) and not completed_puzzles.has(candidate):
+				current_puzzle_id = candidate
+				break
 
 
 func scene_for(scene_id: String) -> Dictionary:

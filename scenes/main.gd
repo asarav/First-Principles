@@ -13,6 +13,7 @@ const FEEDBACK_AUDIO_SCRIPT = preload("res://scenes/feedback_audio.gd")
 var hub: Control
 var start_screen: Control
 var narrative: Control
+var completion: Control
 var workbench: Control
 var back_button: Button
 var year_label: Label
@@ -25,7 +26,10 @@ var narrative_lines: Array = []
 var narrative_line_index: int = 0
 var pending_events: Array = []
 var puzzle_buttons: Dictionary = {}
+var puzzle_list_box: VBoxContainer
 var feedback_audio
+var completion_title: Label
+var completion_body: Label
 
 
 func _ready() -> void:
@@ -65,6 +69,9 @@ func _build() -> void:
 
 	narrative = _build_narrative()
 	add_child(narrative)
+
+	completion = _build_completion()
+	add_child(completion)
 
 	var workbench_script = load("res://scenes/workbench.gd")
 	workbench = workbench_script.new()
@@ -151,9 +158,13 @@ func _build_hub() -> Control:
 	panel_style.bg_color = Color(0.03, 0.05, 0.07)
 	panel.add_theme_stylebox_override("panel", panel_style)
 
+	var layout := HBoxContainer.new()
+	layout.add_theme_constant_override("separation", 28)
+	panel.add_child(layout)
 	var box := VBoxContainer.new()
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	box.add_theme_constant_override("separation", 18)
-	panel.add_child(box)
+	layout.add_child(box)
 
 	var title := Label.new()
 	title.text = "FIRST PRINCIPLES"
@@ -178,14 +189,51 @@ func _build_hub() -> Control:
 	_add_button(row, "Investigate Artifact", _open_transmission)
 	_add_button(row, "Open Workbench", _open_workbench)
 
+	var sidebar_frame := PanelContainer.new()
+	sidebar_frame.custom_minimum_size = Vector2(320, 0)
+	var sidebar_style := StyleBoxFlat.new()
+	sidebar_style.bg_color = Color(0.04, 0.07, 0.09)
+	sidebar_style.border_color = Color(0.20, 0.34, 0.38)
+	sidebar_style.set_border_width_all(1)
+	sidebar_style.set_corner_radius_all(6)
+	sidebar_frame.add_theme_stylebox_override("panel", sidebar_style)
+	layout.add_child(sidebar_frame)
+	var sidebar_scroll := ScrollContainer.new()
+	sidebar_scroll.custom_minimum_size = Vector2(300, 0)
+	sidebar_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	sidebar_frame.add_child(sidebar_scroll)
 	var puzzle_list := VBoxContainer.new()
 	puzzle_list.add_theme_constant_override("separation", 10)
-	box.add_child(puzzle_list)
+	sidebar_scroll.add_child(puzzle_list)
 	var puzzle_title := Label.new()
 	puzzle_title.text = "TRANSMISSION SELECTOR  /  choose an active artifact"
 	puzzle_title.add_theme_color_override("font_color", TEXT_MUTED)
 	puzzle_title.add_theme_font_size_override("font_size", 18)
 	puzzle_list.add_child(puzzle_title)
+	puzzle_list_box = puzzle_list
+	_rebuild_puzzle_buttons()
+	var restart := Button.new()
+	restart.text = "Restart Tutorial"
+	restart.custom_minimum_size = Vector2(190, 36)
+	restart.pressed.connect(func() -> void:
+		_play_feedback("click")
+		GameSession.reset_session()
+		_show_start_screen()
+	)
+	_style_button(restart, NAV_BG, NAV_BORDER, true)
+	restart.tooltip_text = "Clear campaign progress and replay the first-contact tutorial."
+	puzzle_list.add_child(restart)
+	return panel
+
+
+func _rebuild_puzzle_buttons() -> void:
+	if puzzle_list_box == null:
+		return
+	while puzzle_list_box.get_child_count() > 1:
+		var old_button := puzzle_list_box.get_child(1)
+		puzzle_list_box.remove_child(old_button)
+		old_button.queue_free()
+	puzzle_buttons.clear()
 	for puzzle_id in GameSession.available_puzzle_ids():
 		var puzzle := PuzzleLibrary.load_id(puzzle_id)
 		var label := str(puzzle.title) if puzzle else puzzle_id
@@ -201,20 +249,8 @@ func _build_hub() -> Control:
 		btn.custom_minimum_size = Vector2(0, 42)
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		puzzle_buttons[puzzle_id] = btn
-		puzzle_list.add_child(btn)
+		puzzle_list_box.add_child(btn)
 	_refresh_puzzle_selection()
-	var restart := Button.new()
-	restart.text = "Restart Tutorial"
-	restart.custom_minimum_size = Vector2(190, 36)
-	restart.pressed.connect(func() -> void:
-		_play_feedback("click")
-		GameSession.reset_session()
-		_show_start_screen()
-	)
-	_style_button(restart, NAV_BG, NAV_BORDER, true)
-	restart.tooltip_text = "Clear campaign progress and replay the first-contact tutorial."
-	box.add_child(restart)
-	return panel
 
 
 func _refresh_puzzle_selection() -> void:
@@ -265,6 +301,45 @@ func _build_narrative() -> Control:
 		_on_narrative_continue()
 	)
 	continue_button.custom_minimum_size = Vector2(220, 44)
+	_style_button(continue_button, PRIMARY, Color(0.34, 0.78, 0.78), false)
+	box.add_child(continue_button)
+	return panel
+
+
+func _build_completion() -> Control:
+	var panel := MarginContainer.new()
+	panel.set_anchors_preset(PRESET_FULL_RECT)
+	panel.add_theme_constant_override("margin_left", 96)
+	panel.add_theme_constant_override("margin_top", 92)
+	panel.add_theme_constant_override("margin_right", 96)
+	panel.add_theme_constant_override("margin_bottom", 72)
+	panel.visible = false
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 18)
+	panel.add_child(box)
+	var marker := Label.new()
+	marker.text = "EXPERIMENT COMPLETE"
+	marker.add_theme_color_override("font_color", ACCENT)
+	box.add_child(marker)
+	completion_title = Label.new()
+	completion_title.text = "Artifact understood"
+	completion_title.add_theme_font_size_override("font_size", 34)
+	completion_title.add_theme_color_override("font_color", TEXT_MAIN)
+	box.add_child(completion_title)
+	completion_body = Label.new()
+	completion_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	completion_body.add_theme_font_size_override("font_size", 21)
+	completion_body.add_theme_color_override("font_color", TEXT_MAIN)
+	completion_body.custom_minimum_size = Vector2(0, 190)
+	box.add_child(completion_body)
+	var continue_button := Button.new()
+	continue_button.text = "Continue Timeline"
+	continue_button.custom_minimum_size = Vector2(240, 44)
+	continue_button.pressed.connect(func() -> void:
+		_play_feedback("click")
+		completion.visible = false
+		_advance_pending()
+	)
 	_style_button(continue_button, PRIMARY, Color(0.34, 0.78, 0.78), false)
 	box.add_child(continue_button)
 	return panel
@@ -324,19 +399,31 @@ func _show_hub() -> void:
 	start_screen.visible = false
 	hub.visible = true
 	narrative.visible = false
+	completion.visible = false
 	workbench.visible = false
 	back_button.visible = false
+	_rebuild_puzzle_buttons()
 	_refresh_puzzle_selection()
 	year_label.text = "Year %d" % GameSession.year
 	var tx := GameSession.current_transmission()
 	var puzzle := PuzzleLibrary.load_id(GameSession.current_puzzle_id)
 	var title := puzzle.title if puzzle else GameSession.current_puzzle_id
-	body_label.text = "You are Dr. Imane Kessler, working with the Deep Space Array.\nYour task is to turn an unknown transmission into a testable machine.\n\nCurrent artifact: %s\nUnlocked: %s\nCompleted: %s\n\n%s" % [
+	var completed_text := _puzzle_titles(GameSession.completed_puzzles)
+	body_label.text = "You are Dr. Imane Kessler, working with the Deep Space Array.\nYour task is to turn an unknown transmission into a testable machine.\n\nCURRENT OBJECTIVE\n%s\n\nCOMPLETED\n%s\n\n%s" % [
 		title,
-		", ".join(GameSession.unlocked_puzzles),
-		", ".join(GameSession.completed_puzzles) if GameSession.completed_puzzles.size() > 0 else "(none)",
-		"A structured transmission is waiting in the workbench." if tx else "No transmission is currently queued."
+		completed_text,
+		"A new transmission is waiting. Investigate it before opening the workbench." if tx else "No transmission is currently queued."
 	]
+
+
+func _puzzle_titles(ids: PackedStringArray) -> String:
+	if ids.is_empty():
+		return "(none)"
+	var titles := PackedStringArray()
+	for puzzle_id in ids:
+		var puzzle := PuzzleLibrary.load_id(puzzle_id)
+		titles.append(str(puzzle.title) if puzzle else puzzle_id)
+	return "\n".join(titles)
 
 
 func _open_transmission() -> void:
@@ -349,6 +436,7 @@ func _open_workbench() -> void:
 	start_screen.visible = false
 	hub.visible = false
 	narrative.visible = false
+	completion.visible = false
 	workbench.visible = true
 	back_button.visible = true
 	workbench.load_puzzle(GameSession.current_puzzle_id)
@@ -359,6 +447,7 @@ func _show_scene(scene_id: String, afterward: Callable) -> void:
 	start_screen.visible = false
 	hub.visible = false
 	workbench.visible = false
+	completion.visible = false
 	narrative.visible = true
 	back_button.visible = true
 	narrative.set_meta("afterward", afterward)
@@ -401,6 +490,7 @@ func _show_start_screen() -> void:
 	start_screen.visible = true
 	hub.visible = false
 	narrative.visible = false
+	completion.visible = false
 	workbench.visible = false
 	back_button.visible = false
 
@@ -418,7 +508,29 @@ func _quit_game() -> void:
 func _on_puzzle_solved(puzzle_id: String, result: Dictionary) -> void:
 	var follow := GameSession.complete_puzzle(puzzle_id)
 	pending_events = follow.get("events", [])
-	_advance_pending(result)
+	_show_completion_report(puzzle_id, result, follow)
+
+
+func _show_completion_report(puzzle_id: String, result: Dictionary, follow: Dictionary) -> void:
+	start_screen.visible = false
+	hub.visible = false
+	narrative.visible = false
+	workbench.visible = false
+	completion.visible = true
+	back_button.visible = true
+	var puzzle := PuzzleLibrary.load_id(puzzle_id)
+	var title := puzzle.title if puzzle else puzzle_id
+	var test_count: int = result.get("tests", []).size()
+	var next_step := "The timeline has no further recorded event."
+	for event in follow.get("events", []):
+		if event.get("type", "") == "cryosleep":
+			next_step = "You will enter cryosleep. The next transmission is expected in %d years." % int(event.get("years", 0))
+		if event.get("type", "") == "transmission":
+			var next_puzzle := PuzzleLibrary.load_id(str(event.get("puzzle_id", "")))
+			if next_puzzle:
+				next_step = "Next objective: investigate %s." % next_puzzle.title
+	completion_title.text = "%s understood" % title
+	completion_body.text = "Every required experiment passed: %d cases matched the artifact's response.\n\nHumanity has confirmed a new computational primitive. The result is evidence, not yet an explanation.\n\nYear %d\n%s" % [test_count, GameSession.year, next_step]
 
 
 func _advance_pending(result: Dictionary = {}) -> void:

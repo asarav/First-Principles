@@ -61,6 +61,12 @@ func run(t) -> void:
 	t.is_true(not_result.passed, str(not_result.errors))
 	t.eq(not_result.tests.size(), 2)
 
+	t.case("composition puzzle accepts combined primitives")
+	var composition := PuzzleDefinition.load_path("res://data/puzzles/tx003_selective_inversion.json")
+	var composition_solution := Construction.load_path("res://data/constructions/tx003_selective_inversion_sample.json")
+	t.eq(composition.available_components, PackedStringArray(["AND", "NOT"]))
+	t.is_true(Validator.validate(composition, composition_solution).passed)
+
 	t.case("multiple test cases reported")
 	t.eq(result.tests.size(), 4)
 	for case_result in result.tests:

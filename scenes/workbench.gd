@@ -2,7 +2,6 @@ extends Control
 
 signal puzzle_solved(puzzle_id: String, result: Dictionary)
 
-const FLOW_OVERLAY_SCRIPT = preload("res://scenes/signal_flow_overlay.gd")
 const PAN_SPEED := 520.0
 const SIGNAL_ON := Color(0.38, 0.95, 0.78)
 const SIGNAL_OFF := Color(0.28, 0.38, 0.45)
@@ -11,6 +10,7 @@ const PANEL_BG := Color(0.06, 0.09, 0.12)
 const PANEL_LINE := Color(0.18, 0.28, 0.34)
 const UI_MUTED := Color(0.72, 0.82, 0.88)
 const FEEDBACK_AUDIO_SCRIPT = preload("res://scenes/feedback_audio.gd")
+const ACTION_HELP_DEFAULT := "Step: run once · Settle: repeat until stable · Run Tests: check every case"
 
 var puzzle: PuzzleDefinition
 var graph: GraphEdit
@@ -24,16 +24,15 @@ var signal_status_label: Label
 var machine_readout: Label
 var signal_rows: Dictionary = {}
 var palette_box: VBoxContainer
-var flow_overlay
 var guide_label: Label
 var truth_table_box: VBoxContainer
 var last_test_results: Dictionary = {}
 var feedback_audio
 var action_help: Label
-var flow_button: Button
-var flow_is_playing := false
 var tutorial_popup: PopupPanel
 var palette_hint: Label
+var activity_animating := false
+var activity_time := 0.0
 
 
 func _ready() -> void:
@@ -55,6 +54,14 @@ func _process(delta: float) -> void:
 		direction.y += 1.0
 	if direction != Vector2.ZERO:
 		graph.scroll_offset += direction.normalized() * PAN_SPEED * delta
+	if activity_animating:
+		activity_time += delta
+		var pulse := 0.35 + 0.65 * (0.5 + 0.5 * sin(activity_time * TAU * 2.0))
+		_refresh_connection_activity(pulse)
+		if activity_time >= 1.25:
+			activity_animating = false
+			_refresh_connection_activity()
+			action_help.text = ACTION_HELP_DEFAULT
 
 
 func load_puzzle(puzzle_id: String) -> void:
@@ -144,13 +151,9 @@ func _build_ui() -> void:
 	graph.delete_nodes_request.connect(_on_delete_nodes_request)
 	graph.gui_input.connect(_on_graph_gui_input)
 	center.add_child(graph)
-	flow_overlay = FLOW_OVERLAY_SCRIPT.new()
-	flow_overlay.graph = graph
-	flow_overlay.set_anchors_preset(PRESET_FULL_RECT)
-	graph.add_child(flow_overlay)
 
 	action_help = Label.new()
-	action_help.text = "Step: run once · Settle: repeat until stable · Run Tests: check every case"
+	action_help.text = ACTION_HELP_DEFAULT
 	action_help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	action_help.add_theme_font_size_override("font_size", 14)
 	action_help.add_theme_color_override("font_color", UI_MUTED)
@@ -168,24 +171,6 @@ func _build_ui() -> void:
 	_add_button(controls, "⇩ Save", _on_save, "Save the current circuit for this puzzle.")
 	_add_button(controls, "↶ Revert Circuit", _on_reload, "Discard unsaved circuit edits and restore the last saved circuit.")
 	_add_button(controls, "⌗ Frame Graph", _center_graph_on_nodes, "Center the view on all nodes in the circuit.")
-	flow_button = Button.new()
-	flow_button.text = "Ⅱ Pause Flow"
-	flow_button.tooltip_text = "Pause the moving signal indicators."
-	flow_button.custom_minimum_size = Vector2(154, 36)
-	flow_button.pressed.connect(func() -> void:
-		_play_feedback("click")
-		_toggle_flow()
-	)
-	controls.add_child(flow_button)
-	var stop_flow := Button.new()
-	stop_flow.text = "■ Stop Flow"
-	stop_flow.tooltip_text = "Stop the moving signal indicators and return them to the start."
-	stop_flow.custom_minimum_size = Vector2(154, 36)
-	stop_flow.pressed.connect(func() -> void:
-		_play_feedback("click")
-		_stop_flow()
-	)
-	controls.add_child(stop_flow)
 	if OS.is_debug_build():
 		_add_button(controls, "▣ Load Sample", _on_load_sample, "Load the example solution for this puzzle.")
 
@@ -376,7 +361,7 @@ func _add_button(parent: Node, text: String, callback: Callable, hint: String = 
 	)
 	button.mouse_exited.connect(func() -> void:
 		if action_help != null:
-			action_help.text = "Step: run once · Settle: repeat until stable · Run Tests: check every case"
+			action_help.text = ACTION_HELP_DEFAULT
 	)
 	button.custom_minimum_size = Vector2(118, 34)
 	button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
@@ -425,6 +410,7 @@ func _rebuild_graph(construction: Construction) -> void:
 func _center_graph_on_nodes() -> void:
 	if graph == null:
 		return
+	await get_tree().process_frame
 	var nodes: Array[GraphNode] = []
 	for child in graph.get_children():
 		if child is GraphNode:
@@ -435,6 +421,8 @@ func _center_graph_on_nodes() -> void:
 	for node in nodes.slice(1):
 		bounds = bounds.merge(Rect2(node.position_offset, node.size))
 	graph.scroll_offset = bounds.get_center()
+	if OS.is_debug_build():
+		print("Graph frame bounds=%s viewport=%s zoom=%s scroll=%s" % [bounds, graph.size, graph.zoom, graph.scroll_offset])
 
 
 func _make_node(id: String, type_id: String, position: Vector2, config: Dictionary, locked: bool, label_override: String) -> void:
@@ -470,6 +458,13 @@ func _make_node(id: String, type_id: String, position: Vector2, config: Dictiona
 		row.add_child(right)
 		node.add_child(row)
 		node.set_slot(i, i < inputs.size(), 0, Color(0.55, 0.82, 0.9), i < outputs.size(), 0, Color(0.93, 0.76, 0.38))
+	var state_label := Label.new()
+	state_label.name = "SignalState"
+	state_label.text = "waiting"
+	state_label.add_theme_font_size_override("font_size", 11)
+	state_label.add_theme_color_override("font_color", UI_MUTED)
+	node.add_child(state_label)
+	node.set_meta("state_label", state_label)
 
 	if type_id == ComponentTypes.CONST:
 		var check := CheckBox.new()
@@ -515,7 +510,7 @@ func _on_graph_gui_input(event: InputEvent) -> void:
 	var mouse_event := event as InputEventMouseButton
 	if not mouse_event.pressed or mouse_event.button_index != MOUSE_BUTTON_RIGHT:
 		return
-	var connection: Dictionary = flow_overlay.connection_at_point(mouse_event.position)
+	var connection: Dictionary = graph.get_closest_connection_at_point(mouse_event.position, 14.0)
 	if connection.is_empty():
 		return
 	graph.disconnect_node(
@@ -550,26 +545,6 @@ func _on_delete_nodes_request(nodes: Array) -> void:
 		node.free()
 	_sync_machine()
 	_refresh_guidance()
-
-
-func _toggle_flow() -> void:
-	flow_is_playing = not flow_is_playing
-	flow_overlay.set_playing(flow_is_playing)
-	_update_flow_button()
-	status_label.text = "Signal animation resumed." if flow_is_playing else "Signal animation paused."
-
-
-func _stop_flow() -> void:
-	flow_is_playing = false
-	flow_overlay.stop_playing()
-	_update_flow_button()
-	status_label.text = "Signal animation stopped."
-
-
-func _update_flow_button() -> void:
-	if flow_button == null:
-		return
-	flow_button.text = "Ⅱ Pause Flow" if flow_is_playing else "▶ Resume Flow"
 
 
 func _construction_from_graph() -> Construction:
@@ -761,15 +736,36 @@ func _format_result(result: Dictionary) -> String:
 	return "\n".join(lines)
 
 
+func _refresh_connection_activity(activity_scale: float = 1.0) -> void:
+	if graph == null or machine == null:
+		return
+	for item in graph.get_connection_list():
+		var from_id := StringName(str(item.get("from_node", item.get("from", ""))))
+		var to_id := StringName(str(item.get("to_node", item.get("to", ""))))
+		var from_port := int(item.get("from_port", 0))
+		var to_port := int(item.get("to_port", 0))
+		var amount := 0.0
+		if machine.components.has(str(from_id)):
+			var component: SimComponent = machine.components[str(from_id)]
+			if from_port >= 0 and from_port < component.output_ports.size():
+				var value: SignalValue = component.get_output(component.output_ports[from_port])
+				amount = activity_scale if activity_scale < 1.0 else (1.0 if value.is_set() and value.bool_value else 0.0)
+		graph.set_connection_activity(from_id, from_port, to_id, to_port, amount)
+
+
+func _start_connection_activity() -> void:
+	activity_animating = true
+	activity_time = 0.0
+	action_help.text = "RUNNING CIRCUIT · watch the connection lines"
+
+
 func _refresh_monitor(status: String, animate: bool = false) -> void:
 	status_label.text = status
 	if machine == null or puzzle == null:
 		signal_status_label.text = "Waiting for a machine."
 		machine_readout.text = "No signal data yet."
 		return
-	flow_is_playing = animate
-	flow_overlay.set_machine(machine, flow_is_playing)
-	_update_flow_button()
+	_refresh_connection_activity()
 	signal_status_label.text = "STABLE" if machine.last_settled else "CHANGING"
 	var rows := PackedStringArray()
 	rows.append("runs %d" % machine.tick)
@@ -781,6 +777,7 @@ func _refresh_monitor(status: String, animate: bool = false) -> void:
 	_refresh_truth_table()
 	_refresh_node_feedback(animate)
 	if animate:
+		_start_connection_activity()
 		_animate_signal_change(false)
 
 
@@ -793,6 +790,8 @@ func _refresh_node_feedback(animate: bool = false) -> void:
 		if machine == null or not machine.components.has(component_id):
 			continue
 		var component: SimComponent = machine.components[component_id]
+		var state_label: Label = node.get_meta("state_label")
+		state_label.text = _format_component_state(component)
 		var active := false
 		for port in component.output_ports:
 			var value: SignalValue = component.get_output(port)
@@ -806,6 +805,26 @@ func _refresh_node_feedback(animate: bool = false) -> void:
 			tween.tween_property(node, "modulate", target, 0.34)
 		else:
 			node.modulate = target
+
+
+func _format_component_state(component: SimComponent) -> String:
+	var inputs := PackedStringArray()
+	for port in component.input_ports:
+		inputs.append("%s:%s" % [port.to_upper(), _format_signal(component.get_input(port))])
+	var outputs := PackedStringArray()
+	for port in component.output_ports:
+		outputs.append("%s:%s" % [port.to_upper(), _format_signal(component.get_output(port))])
+	if component.type_id == ComponentTypes.INPUT:
+		return "STIMULUS: " + " ".join(outputs)
+	if component.type_id == ComponentTypes.OUTPUT:
+		return "RESPONSE: " + " ".join(inputs)
+	return "%s  %s  ->  %s" % [component.type_id, ", ".join(inputs), ", ".join(outputs)]
+
+
+func _format_signal(value: SignalValue) -> String:
+	if value == null or not value.is_set():
+		return "UNKNOWN"
+	return "ON" if value.bool_value else "OFF"
 
 
 func _refresh_signal_rows() -> void:
